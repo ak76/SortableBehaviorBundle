@@ -1,9 +1,9 @@
 {
-    "name": "ak76/sonata-admin-sortable-behavior",
+    "name": "ak76/sonata-admin-sortable-behavior-bundle",
     "type": "symfony-bundle",
     "description": "Provides a way to sort records in Sonata Admin",
     "keywords": ["sortable", "admin", "sonata", "symfony"],
-    "homepage": "https://github.com/ak76/sonata-admin-sortable-behavior",
+    "homepage": "https://github.com/ak76/sonata-admin-sortable-behavior-bundle",
     "license": "MIT",
     "authors": [
         {
@@ -21,9 +21,9 @@
         "sonata-project/admin-bundle": "2.2.*@dev"
     },
     "autoload": {
-        "psr-0": { "SortableBehaviorBundle": "" }
+        "psr-0": { "Sonata\\Admin\\SortableBehaviorBundle": "" }
     },
-    "target-dir": "SortableBehaviorBundle",
+    "target-dir": "Sonata/Admin/SortableBehaviorBundle",
     "extra": {
         "branch-alias": {
             "dev-master": "0.1-dev"
