@@ -1,0 +1,13 @@
+#
+# Created by PhpStorm.
+# User: Alexander Kondratenko
+# Date: 11.10.2014
+# Time: 7:26
+#
+
+'Position updated': Порядок обновлён
+move:
+    bottom:      Переместить в конец
+    down:        Вниз
+    up:          Вверх
+    top:         Переместить в начало

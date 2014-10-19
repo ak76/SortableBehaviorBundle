@@ -1,0 +1,15 @@
+{% if object.position > 0 %}
+    <a class="btn btn-sm btn-default" href="{{ admin.generateObjectUrl('move', object, {'move': 'top'}) }}" title="{{ 'move.top'|trans }}"><i class="glyphicon glyphicon-step-backward"></i></a>
+{% endif %}
+
+{% if object.position > 0 %}
+    <a class="btn btn-sm btn-default" href="{{ admin.generateObjectUrl('move', object, {'move': 'up'}) }}" title="{{ 'move.up'|trans }}"><i class="glyphicon glyphicon-arrow-up"></i></a>
+{% endif %}
+
+{% if object.position < admin.last_position %}
+    <a class="btn btn-sm btn-default" href="{{ admin.generateObjectUrl('move', object, {'move': 'down'}) }}" title="{{ 'move.down'|trans }}"><i class="glyphicon glyphicon-arrow-down"></i></a>
+{% endif %}
+
+{% if object.position < admin.last_position %}
+    <a class="btn btn-sm btn-default" href="{{ admin.generateObjectUrl('move', object, {'move': 'bottom'}) }}" title="{{ 'move.bottom'|trans }}"><i class="glyphicon glyphicon-step-forward"></i></a>
+{% endif %}
