@@ -1,6 +1,6 @@
 <?php
 
-namespace AK76\SortableBehaviorBundle\Controller;
+namespace Ak76\SortableBehaviorBundle\Controller;
 
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;

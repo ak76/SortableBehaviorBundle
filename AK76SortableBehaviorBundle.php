@@ -1,9 +1,9 @@
 <?php
 
-namespace AK76\SortableBehaviorBundle;
+namespace Ak76\SortableBehaviorBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class AK76SortableBehaviorBundle extends Bundle
+class Ak76SortableBehaviorBundle extends Bundle
 {
 }

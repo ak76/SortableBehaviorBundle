@@ -21,9 +21,9 @@
         "sonata-project/admin-bundle": "2.2.*@dev"
     },
     "autoload": {
-        "psr-0": { "AK76\\SortableBehaviorBundle": "" }
+        "psr-0": { "Ak76\\SortableBehaviorBundle": "" }
     },
-    "target-dir": "AK76/SortableBehaviorBundle",
+    "target-dir": "Ak76/SortableBehaviorBundle",
     "extra": {
         "branch-alias": {
             "dev-master": "0.1-dev"

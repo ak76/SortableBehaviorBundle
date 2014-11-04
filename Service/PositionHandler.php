@@ -1,6 +1,6 @@
 <?php
 
-namespace AK76\SortableBehaviorBundle\Service;
+namespace Ak76\SortableBehaviorBundle\Service;
 
 use Doctrine\ORM\EntityManager;
 

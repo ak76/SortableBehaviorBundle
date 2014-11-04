@@ -1,13 +1,13 @@
 <?php
 
-namespace AK76\SortableBehaviorBundle\DependencyInjection;
+namespace Ak76\SortableBehaviorBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
-class AK76SortableBehaviorExtension extends Extension
+class Ak76SortableBehaviorExtension extends Extension
 {
     /**
      * {@inheritDoc}
