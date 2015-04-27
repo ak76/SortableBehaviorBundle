@@ -43,6 +43,6 @@ public function registerBundles()
 }
 ```
 
-## Usage
+## Documentation
 
-Usage example you can see [here](https://github.com/ak76/sortable-behavior-bundle/blob/master/Resources/doc/index.rst).
+Full documentation is here [here](https://github.com/ak76/sortable-behavior-bundle/blob/master/Resources/doc/index.rst).
