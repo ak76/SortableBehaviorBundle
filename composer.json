@@ -17,9 +17,6 @@
         "symfony/form": ">=2.5",
         "gedmo/doctrine-extensions": ">=2.3"
     },
-    "require-dev": {
-        "sonata-project/admin-bundle": "2.2.*@dev"
-    },
     "autoload": {
         "psr-0": { "Ak76\\SortableBehaviorBundle": "" }
     },

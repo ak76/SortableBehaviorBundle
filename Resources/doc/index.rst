@@ -10,7 +10,7 @@ Background
 However there is no packaged solution to have some up and down arrows to sort
 your records such as showed in the following screen.
 
-.. figure:: ../images/admin_sortable_listing.png
+.. figure:: https://github.com/sonata-project/SonataAdminBundle/blob/master/Resources/doc/images/admin_sortable_listing.png
    :align: center
    :alt: Sortable listing
    :width: 700px
@@ -26,7 +26,6 @@ Pre-requisites
 - you already have gedmo/doctrine-extensions bundle in your project (check stof/doctrine-extensions-bundle
   or knplabs/doctrine-behaviors for easier integration in your project) with the sortable
   feature enabled
-- you already have pixassociates/sortable-behavior-bundle bundle in your project
 
 The recipe
 ----------
@@ -44,31 +43,32 @@ First of are going to add a position field in our ``Client`` entity.
 
 
 In ``ClientAdmin`` our we are going to add in the ``configureListFields`` method
-a custom action and use the default twig template provided in the PixSortableBehaviorBundle
+a custom action and use the default twig template provided in the Ak76SortableBehaviorBundle
 
 .. code-block:: php
 
 	$listMapper
-	->add('_action', 'actions', array(
-                'actions' => array(
-                    'move' => array('template' => 'PixSortableBehaviorBundle:Default:_sort.html.twig'),
-                )
-            ));
+	    ->add('_action', 'actions', array(
+            'actions' => array(
+                'move' => array('template' => 'Ak76SortableBehaviorBundle:Sort/bootstrap2:_sort.html.twig')
+            )
+        ));
 
 
 
-In order to add new routes for these actions we are also adding the following method
+(There are two template versions. First is for Bootstrap v2 and second is for Bootstrap v3)
+In order to add new routes for these actions we are also adding the following method where you should set variable ``property`` which represents the name of the position field of our ``Client`` entity.
 
 .. code-block:: php
 
 	protected function configureRoutes(RouteCollection $collection)
 	{
-	    $collection->add('move', $this->getRouterIdParameter() . '/move/{position}');
+	    $collection->add('move', $this->getRouterIdParameter() . '/move/{move}/{property}', [], ['move' => 'up|down|top|bottom', 'property' => 'position']);
 	}
 
 
 
-Now you can update your ``admin.yml`` to use the handler provider by the PixSortableBehaviorBundle
+Now you can update your ``services.yml`` to use the handler provider by the PixSortableBehaviorBundle
 
 .. code-block:: yaml
 
@@ -80,70 +80,61 @@ Now you can update your ``admin.yml`` to use the handler provider by the PixSort
 	        arguments:
 	            - ~
 	            - Acme\DemoBundle\Entity\Client
-	            - 'PixSortableBehaviorBundle:SortableAdmin' # define the new controller via the third argument
+	            - 'Ak76SortableBehaviorBundle:SortableAdmin' # define the new controller via the third argument
 	        calls:
 	            - [ setTranslationDomain, [AcmeDemoBundle]]
 
 
-Last tricky part, in order to get the last position available in our twig template
-we inject the service container in our admin class, define a public variable ``$last_position``
-and retrieve the value from our service in the ``configureListFields`` method. We
-also define the sort by field to be position
+Here is the example of the ``ClientAdmin``.
 
 .. code-block:: php
 
    class ClientAdmin extends Admin
    {
-
-    public $last_position = 0;
-
-    private $container;
+    /** @var PositionHandler */
     private $positionService;
 
-    public function setContainer(\Symfony\Component\DependencyInjection\ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    public function setPositionService(\Pix\SortableBehaviorBundle\Services\PositionHandler $positionHandler)
-    {
-        $this->positionService = $positionHandler;
-    }
-    
     protected $datagridValues = array(
         '_page' => 1,
         '_sort_order' => 'ASC',
         '_sort_by' => 'position',
     );
 
+    /**
+     * @return PositionHandler
+     */
+    public function getPositionService()
+    {
+        return $this->positionService;
+    }
+
+    /**
+     * @param PositionHandler $positionHandler
+     */
+    public function setPositionService(PositionHandler $positionHandler)
+    {
+        $this->positionService = $positionHandler;
+    }
+
     protected function configureListFields(ListMapper $listMapper)
     {
-        $this->last_position = $this->positionService->getLastPosition($this->getRoot()->getClass());
         $listMapper
             ->addIdentifier('name')
             ->add('enabled')
             ->add('_action', 'actions', array(
                 'actions' => array(
-                    'move' => array('template' => 'AcmeDemoBundle:Admin:_sort.html.twig'),
+                    'move' => array('template' => 'Ak76SortableBehaviorBundle:Sort/bootstrap2:_sort.html.twig')
                 )
             ));
     }
 
-And in  the admin.yml add the following call
+And in the services.yml add the following call
 
 .. code-block:: yaml
-    
-	- [ setContainer, [ @service_container ] ]
-	- [ setPositionService, [@pix_sortable_behavior.position]]
+
+    - [ setPositionService, [@ak76.sortable_behavior.position_handler]]
 
 
 You should now have in your listing a new action column with 4 arrows to sort your records.
 
 Enjoy ;)
-
-
-Further work
-------------
-
-* handle ajax request
-* interface for SonataAdminBundle

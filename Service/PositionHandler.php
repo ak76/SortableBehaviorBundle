@@ -3,133 +3,118 @@
 namespace Ak76\SortableBehaviorBundle\Service;
 
 use Doctrine\ORM\EntityManager;
+use Sonata\AdminBundle\Admin\Admin;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class PositionHandler
 {
-    const UP        = 'up';
-    const DOWN      = 'down';
-    const TOP       = 'top';
-    const BOTTOM    = 'bottom';
+    const MOVE_UP        = 'up';
+    const MOVE_DOWN      = 'down';
+    const MOVE_TOP       = 'top';
+    const MOVE_BOTTOM    = 'bottom';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
+
+    /** @var int */
+    protected $lastPosition;
 
     /**
      * @param EntityManager $entityManager
+     * @param PropertyAccessor $propertyAccessor
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, PropertyAccessor $propertyAccessor)
     {
         $this->em = $entityManager;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
-     * @param $object
-     * @param $move
-     */
-    public function updatePosition(&$object, $move)
-    {
-//        $property = $this->getPropertyName($object);
-
-        $last_position = $this->getLastPosition(get_class($object));
-        $new_position = $this->getNewPosition($object, $move, $last_position);
-        $object->setPosition($new_position);
-    }
-
-    /**
-     * @param $object
-     * @param $move
-     * @param $last_position
-     * @return int
-     */
-    protected function getNewPosition($object, $move, $last_position)
-    {
-        switch ($move) {
-            case self::UP:
-                if ($object->getPosition() > 0) {
-                    $new_position = $object->getPosition() - 1;
-                }
-                break;
-
-            case self::DOWN:
-                if ($object->getPosition() < $last_position) {
-                    $new_position = $object->getPosition() + 1;
-                }
-                break;
-
-            case self::TOP:
-                if ($object->getPosition() > 0) {
-                    $new_position = 0;
-                }
-                break;
-
-            case self::BOTTOM:
-                if ($object->getPosition() < $last_position) {
-                    $new_position = $last_position;
-                }
-                break;
-        }
-
-        $this->updateAll($object, $move);
-
-        return $new_position;
-    }
-
-    /**
+     * Get last position - max value of the $property in $entity
+     *
      * @param $entity
+     * @param $property
+     * @param bool $forceUpdate
      * @return int
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLastPosition($entity)
+    public function getLastPosition($entity, $property, $forceUpdate = false)
     {
-        $query = $this->em->createQuery('SELECT MAX(m.position) FROM ' . $entity . ' m');
-        $result = $query->getResult();
-
-        if (array_key_exists(0, $result)) {
-            return intval($result[0][1]);
+        if ($this->lastPosition == null || $forceUpdate) {
+            $this->updateLastPosition($entity, $property);
         }
 
-        return 0;
+        return $this->lastPosition;
     }
 
     /**
-     * Reorder all records except moved record
+     * Update position value
+     *
      * @param $object
+     * @param $property
      * @param $move
      */
-    protected function updateAll($object, $move)
+    public function updatePosition(&$object, $property, $move)
     {
-        $query = $this->em->createQueryBuilder();
-        $query ->update(get_class($object), 'p');
-
-        switch ($move) {
-            case self::UP:
-                $query->set('p.position', 'p.position + 1')
-                    ->where('p.position = '.($object->getPosition() - 1));
-                break;
-
-            case self::DOWN:
-                $query->set('p.position', 'p.position - 1')
-                    ->where('p.position = '.($object->getPosition() + 1));
-                break;
-
-            case self::TOP:
-                $query->set('p.position', 'p.position + 1')
-                    ->where('p.position < '.$object->getPosition());
-                break;
-
-            case self::BOTTOM:
-                $query->set('p.position', 'p.position - 1')
-                    ->where('p.position > '.$object->getPosition());
-                break;
-        }
-
-        $query->getQuery()->execute();
+        $this->updateLastPosition(get_class($object), $property);
+        $this->updateObjectPosition($object, $property, $move);
     }
 
-    protected function getPropertyName($object)
+    /**
+     * Update $property in the given $object according with $move
+     *
+     * @param Admin $object
+     * @param $property
+     * @param $move
+     * @return int
+     */
+    protected function updateObjectPosition(&$object, $property, $move)
     {
-        $metadata = $this->em->getClassMetadata(get_class($object));
-        return $metadata->getFieldMapping($metadata);
+        $currentPosition = $this->propertyAccessor->getValue($object, $property);
+
+        switch ($move) {
+            case self::MOVE_UP:
+                if ($currentPosition > 0) {
+                    $currentPosition--;
+                }
+            break;
+
+            case self::MOVE_DOWN:
+                if ($currentPosition < $this->lastPosition) {
+                    $currentPosition++;
+                }
+            break;
+
+            case self::MOVE_TOP:
+                if ($currentPosition > 0) {
+                    $currentPosition = 0;
+                }
+            break;
+
+            case self::MOVE_BOTTOM:
+                if ($currentPosition < $this->lastPosition) {
+                    $currentPosition = $this->lastPosition;
+                }
+            break;
+        }
+
+        $this->propertyAccessor->setValue($object, $property, $currentPosition);
+    }
+
+    /**
+     * Get max value of the $property from $entity
+     *
+     * @param $entity
+     * @param $property
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    protected function updateLastPosition($entity, $property)
+    {
+        $query = $this->em->createQuery('SELECT MAX(m.' . $property . ') AS last_position FROM ' . $entity . ' m');
+        $result = $query->getOneOrNullResult();
+        $this->lastPosition = is_null($result['last_position']) ? 0 : $result['last_position'];
     }
 }

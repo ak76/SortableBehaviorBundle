@@ -1,5 +1,6 @@
 services:
-    ak76_sortable_behavior.position:
+    ak76.sortable_behavior.position_handler:
         class: Ak76\SortableBehaviorBundle\Service\PositionHandler
         arguments:
-            entityManager: "@doctrine.orm.entity_manager"
+            - @doctrine.orm.entity_manager
+            - @property_accessor
